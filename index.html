@@ -117,6 +117,7 @@
     //window.alert("don't support yet");
   }
   window.addEventListener("deviceorientation", sendOrientationMsg, true);
+  window.addEventListener("keydown", keyPressed, false);
 
   // generate the QR code URL, using proxy on sg demo nginx
   function getQrUrl(size) {
@@ -144,7 +145,7 @@
     };
 
     QRCode.toDataURL('https://sg.solace.com/qr?'+cloudIndex+nonUid, opts, function (err, url) {
-      console.log(url)
+      //console.log(url)
       loadQr3(url);
     });
   }
@@ -214,6 +215,10 @@
   }
 
   function loadQr3(url) {
+    if (!isMobile) {
+      // small QR code for the right bottom corner on desktops
+      document.getElementById("mini_qr_div_br").innerHTML = '<img width="64" src="'+url+'"/>';
+    }
     qrTexture = new THREE.TextureLoader().load(url,
       // onLoad callback
       function ( qrTexture ) {
@@ -336,7 +341,8 @@
 
   //addConnection("AWS Ireland",  "vmr-mr8v6yiwicdj.messaging.solace.cloud",     Number(20553),"thisisapassword");
   //addConnection("AWS Singapore","mr1bjj91s4bc2t.messaging.solace.cloud",  Number(8443),"thisisapassword");
-  addConnection("AWS Singapore","mr1bjj91s4bc2t.messaging.solace.cloud",  Number(8443),"76be0527a6kr46hvcrbr5l5dac");
+  ///addConnection("AWS Singapore","mr1bjj91s4bc2t.messaging.solace.cloud",  Number(8443),"76be0527a6kr46hvcrbr5l5dac");
+  addConnection("Eclipse Test Server","mqtt.eclipse.org",  Number(443),"");
   var isBenchmarking = false;  // set to true when first connect, then introduce timer
   var isConnSelected = false;
   var prevMsgSent = 0;
@@ -479,7 +485,7 @@
           camera.position.z = 450;  // move camera closer
           document.getElementById("info_div_tr").style.display = "block";  // show the "explain" div
           if (!isMobile) {
-            document.getElementById("mini_qr_div_br").innerHTML = '<img width="64" src="'+getQrUrl(64)+'"/>';
+            //document.getElementById("mini_qr_div_br").innerHTML = '<img width="64" src="'+getQrUrl(64)+'"/>';
             document.getElementById("mini_qr_div_br").style.display = "block";
           }
         }
@@ -529,7 +535,18 @@
   //   var message = new Paho.MQTT.Message(""+event.keyCode);
   //   message.destinationName = "keypress";
   //   chosen.send(message);
-     console.log(event.keyCode);
+     //console.log(event.keyCode);
+     //console.log(event.key);
+     var factor = 0.1;
+     if (event.key === "ArrowRight") {
+       mesh.rotation.y -= factor;
+     } else if (event.key === "ArrowLeft") {
+       mesh.rotation.y += factor;
+     } else if (event.key === "ArrowUp") {
+       mesh.rotation.x -= factor;
+     } else if (event.key === "ArrowDown") {
+       mesh.rotation.x += factor;
+     }
    }
 
   function sendOrientationMsg(event) {
