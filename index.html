@@ -16,8 +16,8 @@
       background: -moz-linear-gradient(top, #333333 0%, #000000 80%, #333333 100%); /* FF3.6-15 */
       background: -webkit-linear-gradient(top, #333333 0%, #000000 80%, #333333 100%); /* Chrome10-25,Safari5.1-6 */
       background: linear-gradient(to bottom, #333333 0%, #000000 80%, #333333 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
-      //old//background: linear-gradient(to bottom, #333333 0%, #111111 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
       filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#333333', endColorstr='#111111',GradientType=0 ); /* IE6-9 */
+      overscroll-behavior-y: contain;
     }
     a {
       color: #00CB95;
@@ -90,7 +90,7 @@
     isMobile = true;
     //window.alert(navigator.userAgent);
     document.getElementById('phone').innerHTML = '<i>another</i>';  // change 'a phone' to 'another phone'
-    window.alert('NOTE: this demo is curently broken on newer iPhones b/c iOS changed their stupid permissions!');
+    //window.alert('NOTE: this demo is curently broken on newer iPhones b/c iOS changed their stupid permissions!');
   }
   uid = ""+(Math.random() + 1).toString(36).substring(2,6);  // generate a "random" [0-9a-z] 4 char ID
   console.log("uid: "+uid);
@@ -119,6 +119,58 @@
   }
   window.addEventListener("deviceorientation", sendOrientationMsg, true);
   window.addEventListener("keydown", keyPressed, false);
+  document.addEventListener("touchstart", touchStart, {passive: false});
+  document.addEventListener("touchmove", touchMove, {passive: false});
+  document.addEventListener("touchend", touchEnd, {passive: false});
+
+  var touchX = null;
+  var touchY = null;
+  var diffX = 0;
+  var diffY = 0;
+  var spinning = false;
+
+  function touchStart(e) {
+    if (!chosenIsConnected || isLocked) return;
+    //if (isMobile) e.preventDefault();
+    e.preventDefault();
+    //console.log("Start swipe");
+    spinning = false;
+    touchX = e.touches[0].screenX;
+    touchY = e.touches[0].screenY;
+  }
+
+  function touchMove(e) {
+    if (!chosenIsConnected || isLocked) return;
+    if (isMobile) e.preventDefault();
+    e.preventDefault();
+    diffX = e.touches[0].screenX - touchX;  // calculate the diff
+    diffY = e.touches[0].screenY - touchY;
+    touchX = e.touches[0].screenX;  // update the previous coordinates
+    touchY = e.touches[0].screenY;
+    //console.log("x: "+diffX+", y:"+diffY);
+    sendSwipeMsg(diffX,diffY);  // publish a message
+  }
+
+  function touchEnd(e) {
+    //console.log("Release!  diffX:"+diffX+", diffY: "+diffY);
+    if (!chosenIsConnected || isLocked) return;
+    spinning = true;
+    spin();
+  }
+
+  function spin() {
+    if (!spinning) return;
+    var deets = {id: uid, a: 0, b: (diffY*-0.3333), g: (diffX*-0.3333)};
+    //console.log(deets);
+    var message = new Paho.MQTT.Message(JSON.stringify(deets));
+    message.destinationName = "qr/ori2/"+linkUid;
+    chosen.send(message);
+    diffX *= 0.95;
+    diffY *= 0.95;
+    if (Math.abs(diffX) > 0.5 || Math.abs(diffY) > 0.5) {
+      window.setTimeout(spin,25);
+    }
+  }
 
   // generate the QR code URL, using proxy on sg demo nginx
   function getQrUrl(size) {
@@ -152,7 +204,7 @@
   }
 
   var camera, scene, renderer;
-  var mesh;
+  var cube;
   var bufferScene;
   var bufferTexture;
   var backdrop_material;
@@ -234,9 +286,7 @@
         alert( "Couldn't fetch QR code. Sorry!!" );
       }
     );
- 
   }
-
 
 
   function loadQr() {
@@ -271,9 +321,9 @@
       new THREE.MeshStandardMaterial( { map: qrTexture } ),  //front
       new THREE.MeshStandardMaterial( { map: qrTexture } ),
     ];
-    mesh = new THREE.Mesh( geometry, material );
+    cube = new THREE.Mesh( geometry, material );
     scene.remove(benchPlane);
-    scene.add(mesh);
+    scene.add(cube);
     // all done at this point!
     chosenIsConnected = true;
     if (!isLocked && !isMobile) {
@@ -316,6 +366,9 @@
       if (message.destinationName == "qr/ori/"+linkUid) {
         msgRec++;
         rotate(JSON.parse(message.payloadString));
+      } else if (message.destinationName == "qr/ori2/"+linkUid) {
+        msgRec++;
+        rotate2(JSON.parse(message.payloadString));
       } else if (message.destinationName == "qr/timing/"+uid) {
         if (isBenchmarking) {
           var delta = Date.now() - message.payloadString;
@@ -346,7 +399,7 @@
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   addConnection("Eclipse Test Server","mqtt.eclipse.org",Number(443),true,"","");       // pretty good
   addConnection("Mosquitto Test Server","test.mosquitto.org",Number(8081),true,"","");  // garbage
-  // add more WSS MQTT connections here... sign up for Solace Cloud!!
+  // add more *WSS* MQTT connections here... sign up for Solace Cloud!!
   //addConnection("Solace Cloud (Where??)","",Number(8443),true,"solace-cloud-client","");
 
   var isBenchmarking = false;  // set to true when first connect, then introduce timer
@@ -378,16 +431,16 @@
   }
 
   var connCount = 0;
-  var fuckedCount = 0;
+  var tooLateCount = 0;
   // called when the client connects
   function onConnect(obj) {
+if (chosenIsConnected) return;
     connCount++;
     //document.getElementById('conn').innerHTML = '<i>CONNECT'+connCount+'</i>';
     var client = obj.invocationContext;
     client.subscribe("qr/timing/"+uid);  // for my latency measurements
     if (isConnSelected) {  // if we've already chosen which connection, just ignore this late connect guy
-      fuckedCount++;
-      //document.getElementById('phone').innerHTML = '<i>FUCKED'+fuckedCount+'</i>';  // change 'a phone' to 'another phone'
+      tooLateCount++;
       client.disconnect();
       return;
     }
@@ -451,6 +504,7 @@
   function finalizeChooseConnection() {
     document.getElementById('conn').value = 'Connected to '+chosen.desc;
     chosen.subscribe("qr/ori/"+linkUid);
+    chosen.subscribe("qr/ori2/"+linkUid);
     isBenchmarking = false;
     isConnSelected = true;  // benchmarking is done, choose the connection!
     //loadQr();
@@ -480,12 +534,12 @@
   var prev = {};
   function rotate(deets) {
     //console.log("rotate("+JSON.stringify(deets));
-    if (!prev.hasOwnProperty(deets.id)) {  // first time seeing
+    if (!prev.hasOwnProperty(deets.id)) {  // first time seeing this particular UID
       prev[deets.id] = {};  // initialize
       prev[deets.id]["alpha"] = deets.a;
       prev[deets.id]["beta"]  = deets.b;
       prev[deets.id]["gamma"] = deets.g;
-      if (deets.id != uid) {  // i.e. not myself
+      //if (deets.id != uid) {  // i.e. not myself
         if (isLocked) {  // and I'm still isLocked, waiting for a joiner
           isLocked = false;  // now unlock
           camera.position.z = 450;  // move camera closer
@@ -495,10 +549,10 @@
             document.getElementById("mini_qr_div_br").style.display = "block";
           }
         }
-        newJoiner(0);
-      }
+        newJoiner(0);  // flash the screen
+      //}
     }
-    if (isLocked) return;
+    //if (isLocked) return;
     // best: alpha = y, beta = x, gamma = z
 // DeviceOrientationEvent.alpha: A number representing the motion of the device around the z axis, express in degrees with values ranging from 0 to 360.
 // DeviceOrientationEvent.beta: A number representing the motion of the device around the x axis, express in degrees with values ranging from -180 to 180. This represents a front to back motion of the device.
@@ -525,10 +579,10 @@
       }
     }
     var factor = 0.015;
-    //mesh.rotation.x -= factor * (prev[deets.id]["beta"] - deets.b);
-    mesh.rotation.y -= factor * (prev[deets.id]["alpha"] - deets.a);
-    mesh.rotation.x -= factor * (prev[deets.id]["beta"] - deets.b);
-    mesh.rotation.z += factor * (prev[deets.id]["gamma"] - deets.g); 
+    //cube.rotation.x -= factor * (prev[deets.id]["beta"] - deets.b);
+    cube.rotation.y -= factor * (prev[deets.id]["alpha"] - deets.a);
+    cube.rotation.x -= factor * (prev[deets.id]["beta"] - deets.b);
+    cube.rotation.z += factor * (prev[deets.id]["gamma"] - deets.g); 
     //textMesh2.rotation.y -= factor * (prev[deets.id]["alpha"] - deets.a);
     //textMesh2.rotation.x -= factor * (prev[deets.id]["beta"] - deets.b);
     //textMesh2.rotation.z += factor * (prev[deets.id]["gamma"] - deets.g); 
@@ -536,6 +590,36 @@
     prev[deets.id]["beta"] = deets.b;
     prev[deets.id]["gamma"] = deets.g;
   }
+
+
+  function rotate2(deets) {
+    //console.log("rotate("+JSON.stringify(deets));
+    if (!prev.hasOwnProperty(deets.id)) {  // first time seeing this particular UID
+      prev[deets.id] = {};  // initialize
+      //prev[deets.id]["alpha"] = deets.a;
+      //prev[deets.id]["beta"]  = deets.b;
+      //prev[deets.id]["gamma"] = deets.g;
+      //if (deets.id != uid) {  // i.e. not myself
+        if (isLocked) {  // and I'm still isLocked, waiting for a joiner
+          isLocked = false;  // now unlock
+          camera.position.z = 450;  // move camera closer
+          document.getElementById("info_div_tr").style.display = "block";  // show the "explain" div
+          if (!isMobile) {
+            //document.getElementById("mini_qr_div_br").innerHTML = '<img width="64" src="'+getQrUrl(64)+'"/>';
+            document.getElementById("mini_qr_div_br").style.display = "block";
+          }
+        }
+        newJoiner(0);  // flash the screen
+      //}
+    }
+    if (isLocked) return;
+    var factor = 0.015;
+    var factor = 0.02;
+    cube.rotation.z -= factor * deets.a;
+    cube.rotation.x -= factor * deets.b;
+    cube.rotation.y -= factor * deets.g;
+  }
+
 
    function keyPressed(event) {
      if (!chosenIsConnected || isLocked) return;
@@ -556,16 +640,80 @@
      }
    }
 
+  var firstOri = false;
+  var prevOri = { alpha: 0, beta: 0, gamma: 0 };
   function sendOrientationMsg(event) {
+    //if (!chosenIsConnected) return;
     if (!chosenIsConnected || isLocked) return;
     //if (isLocked) return;
-    var alpha = 1 * event.alpha.toFixed(2);
-    var beta =  1 * event.beta.toFixed(2);
-    var gamma = 1 * event.gamma.toFixed(2);
-    var deets = {id: uid, a: alpha, b: beta, g: gamma};
+    if (!firstOri) {
+      firstOri = true;
+      //window.alert("You've just received the first orientation event!");
+      //window.alert( 1 * event.alpha.toFixed(2));
+      //window.alert( 1 * event.beta.toFixed(2));
+      //window.alert( 1 * event.gamma.toFixed(2));
+      // just set them manually/directly
+      //prevOri.alpha = 1 * event.alpha.toFixed(3);
+      //prevOri.beta =  1 * event.beta.toFixed(3);
+      //prevOri.gamma = 1 * event.gamma.toFixed(2);
+      prevOri.alpha = event.alpha;
+      prevOri.beta =  event.beta;
+      prevOri.gamma = event.gamma;
+    }
+    // get current values
+    var alpha = event.alpha;
+    var beta =  event.beta;
+    var gamma = event.gamma;
+
+    // alpha: 0,360;  beta: -180,180;  gamma: -90,90
+    if (Math.abs(prevOri.alpha - alpha) > 270) { // assume wraparound 0->359
+      if (alpha < 180) {
+        prevOri.alpha -= 360;
+      } else {
+        prevOri.alpha += 360;
+      }
+    }
+    if (Math.abs(prevOri.beta - beta) > 270) { // assume wraparound -180->180
+      if (beta < 0) {
+        prevOri.beta -= 360;
+      } else {
+        prevOri.beta += 360;
+      }
+    }
+    if (Math.abs(prevOri.gamma - gamma) > 135) { // assume wraparound -90->90
+      if (gamma < 0) {
+        prevOri.gamma -= 180;
+      } else {
+        prevOri.gamma += 180;
+      }
+    }
+    //var factor = 0.015;
+    var factor = 1;
+    var diffA = 1* (factor * (prevOri.alpha - alpha)).toFixed(6);
+    var diffB = 1* (factor * (prevOri.beta - beta)).toFixed(6);
+    var diffG = 1* (factor * (prevOri.gamma - gamma)).toFixed(6);
+    var deets = {id: uid, a: diffA, b: diffB, g: diffG};
     //console.log(deets);
     var message = new Paho.MQTT.Message(JSON.stringify(deets));
-    message.destinationName = "qr/ori/"+linkUid;
+    message.destinationName = "qr/ori2/"+linkUid;
+    chosen.send(message);
+    prevOri.alpha = alpha;
+    prevOri.beta = beta;
+    prevOri.gamma = gamma;
+  }
+
+  function sendSwipeMsg(x,y) {
+    //if (!chosenIsConnected) return;
+    //  cube.rotation.y += x * 0.01;
+   //   cube.rotation.x += y * 0.01;
+   //   return;
+
+    //cube.rotation.y -= factor * (prev[deets.id]["alpha"] - deets.a);
+    //cube.rotation.x -= factor * (prev[deets.id]["beta"] - deets.b);
+    var deets = {id: uid, a: 0, b: (y*-0.3333), g: (x*-0.3333)};
+    //console.log(deets);
+    var message = new Paho.MQTT.Message(JSON.stringify(deets));
+    message.destinationName = "qr/ori2/"+linkUid;
     chosen.send(message);
   }
 
@@ -585,9 +733,9 @@
     // wait until we've chosen which connection we want, and have linked to one other (i.e. unlocked)
     if (!chosenIsConnected || isLocked) return;
     var factor = 0.00025;
-    mesh.rotation.y -= factor * 4;
-    mesh.rotation.x -= factor * 2;
-    mesh.rotation.z += factor * 1;
+    cube.rotation.y -= factor * 4;
+    cube.rotation.x -= factor * 2;
+    cube.rotation.z += factor * 1;
   },25);
 
   // update the message rates every 250ms
