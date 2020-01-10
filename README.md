@@ -7,7 +7,7 @@ https://sg.solace.com/qr
 
 # Premise
 
-Click on the link to load up the page. It will generate a QR code to scan with a phone. 
+Click [here](https://sg.solace.com/qr) load up the page. It will generate a QR code to scan with a phone. Once the phone connects and entagles, you can control the cube from either device either via rotational/accelerometer data (doesn't work on iPhones anymore), or via swipe gestures.
 
 # Instructions to deploy
 
