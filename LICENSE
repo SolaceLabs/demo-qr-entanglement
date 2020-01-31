@@ -8,11 +8,12 @@ MIT License
 https://github.com/davidshimjs/qrcodejs/blob/master/LICENSE
 
 
-Eclipse Paho
-------------
+Eclipse Paho MQTT
+-----------------
 https://www.eclipse.org/paho/clients/js/
 https://projects.eclipse.org/projects/technology.paho/downloads
-Unknown License?
+Eclipse Public License - v 2.0
+https://www.eclipse.org/legal/epl-2.0/
 
 
 Three.js
