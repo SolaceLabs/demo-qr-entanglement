@@ -12,22 +12,14 @@ Click [here](https://sg.solace.com/qr) load up the page. It will generate a QR c
 # Instructions to deploy
 
 1. Clone/copy to some webserver somewhere, e.g.: `https://sg.solace.com/qr`
-2. Edit the index.html file:
+1. Edit the index.html file:
    1. Update the URL variable near the top to match your webserver URL
-   2. Add any additional MQTT server connections to the connections section (around halfway through the file).  Feel free to sign up for Solace Cloud: https://cloud.solace.com
-3. Sflksjfdlka jfd
-
+   1. Add any additional MQTT server connections to the connections section (around halfway through the file).  Feel free to sign up for Solace Cloud: https://cloud.solace.com
+1. Run it, and scan it!
 
 
 
 # Licences
 
-This project uses a couple libraries
-
-* Three.js
-* Paho MQTT.js
-* QRCode.js
-
-
-
+Check the LICENSE file
 
