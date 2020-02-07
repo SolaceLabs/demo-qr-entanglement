@@ -1,4 +1,6 @@
 # Entanglement QR Code Demo
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2FSolaceLabs%2Fdemo-qr-entanglement.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2FSolaceLabs%2Fdemo-qr-entanglement?ref=badge_shield)
+
 Another demo by Aaron to visualize the latency and connectiveness with Solace Cloud MQTT
 
 https://sg.solace.com/qr
@@ -23,3 +25,6 @@ Click [here](https://sg.solace.com/qr) load up the page. It will generate a QR c
 
 Check the LICENSE file
 
+
+
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2FSolaceLabs%2Fdemo-qr-entanglement.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2FSolaceLabs%2Fdemo-qr-entanglement?ref=badge_large)
