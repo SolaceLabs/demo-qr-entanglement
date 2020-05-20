@@ -417,7 +417,7 @@
       console.log("Connecting to "+client.desc);
       client.connect(client.connectOptions);
     }
-  } else {
+  } else {  // the broker has been selected, and we're just choosing it
     chosen = connections[serverIndex]['client'];
     document.getElementById('conn').value = 'Connecting to '+chosen.desc;
     console.log("Connecting to "+chosen.desc);
