@@ -13,14 +13,14 @@
     body, html {
       margin: 0px;
       padding: 0px;
-      background: -moz-linear-gradient(top, #333333 0%, #000000 80%, #333333 100%); /* FF3.6-15 */
-      background: -webkit-linear-gradient(top, #333333 0%, #000000 80%, #333333 100%); /* Chrome10-25,Safari5.1-6 */
-      background: linear-gradient(to bottom, #333333 0%, #000000 80%, #333333 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+      background: -moz-linear-gradient(top, #37404A 0%, #000000 80%, #37404A 100%); /* FF3.6-15 */
+      background: -webkit-linear-gradient(top, #37404A 0%, #000000 80%, #37404A 100%); /* Chrome10-25,Safari5.1-6 */
+      background: linear-gradient(to bottom, #37404A 0%, #000000 80%, #37404A 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
       filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#333333', endColorstr='#111111',GradientType=0 ); /* IE6-9 */
       overscroll-behavior-y: contain;
     }
     a {
-      color: #00CB95;
+      color: #00C895;
     }
     a:active {
       color: #ffffff;
@@ -50,6 +50,7 @@
       z-index: 99;
       background-color: rgba(255, 255, 255, 0);
       padding: 10px;
+      pointer-events: all;
     }
     #mini_qr_div_br {
       position: absolute;
@@ -59,21 +60,29 @@
       background-color: rgba(255, 255, 255, 0);
       padding: 10px;
     }
+    #touch_here {
+      position: absolute;
+      left:0px;
+      top:0ps;
+      z-index: 200;
+      opacity: 0;
+    }
   </style>
 </head>
 <body>
-<div id='info_div_tr'><a href="explain.html" target="_blank"><img src="gfx/qr_explain.png"/></a></div>
+<div id='info_div_tr'><a href="explain.html" target="_blank"><img src="gfx/qr_explain3.png"/></a></div>
+<div id='touch_here'><img src="gfx/touch2.png"/></div>
 <div id='mini_qr_div_br'></div>
 <div id="solace_logo_div_tl">
   <img src="gfx/entanglement3.png"/>
 </div>
 <div id="text_div_bl">
-  <span style="font-family: Arial, sans-serif; font-size: 100%; color: #00CB95">
-    An event-driven demo by <b>Aaron</b>&nbsp;&nbsp;<span style="font-size: 80%">&copy; 2019</span><br/>
+  <span style="font-family: Arial, sans-serif; font-size: 100%; color: #00C895">
+    An event-driven demo by <b>Aaron</b>&nbsp;&nbsp;<span style="font-size: 80%">&copy; 2021</span><br/>
     Real-time WebSockets PubSub&plus; communication<br/>
-    <b>Scan the QR code with <output id=phone>a</output> phone to entangle</b><br/>
+    <span style="color: #00fdba"><b>Scan the QR code with <output id=phone>a</output> phone to entangle</b></span><br/>
     <br/>
-    <span style="color: #00CB95aa">Latency: <output id=ts>--</output> ms;&nbsp;&nbsp;<!--output id=sent>-</output> msg/s send;&nbsp;&nbsp;--><output id=message_rate>--</output> messages/sec<br/>
+    <span style="color: #00C895aa">Latency: <output id=ts>--</output> ms;&nbsp;&nbsp;<!--output id=sent>-</output> msg/s send;&nbsp;&nbsp;--><output id=message_rate>--</output> messages/sec<br/>
     <b><output id=conn>Disconnected</output></b></span>
   </span>
 </div>
@@ -81,9 +90,10 @@
   const URL_WHERE_DEPLOYED = "https://sg.solace.com/qr";
   var uid;     // the UniqueID for this particular client instance
   var linkUid;  // the "linked" ID for entanglement communication
-  var serverIndex;  // which mqtt server connection instance am I connected to?
+  var serverIndex = null;  // which mqtt server connection instance am I connected to?
   var isMobile = false;  //initiate as false
   var isLocked = true;   // don't rotate the cube until we link
+  var leader = false;
   // device detection...
   if (/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|ipad|iris|kindle|Android|Silk|lge |maemo|midp|mmp|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows (ce|phone)|xda|xiino/i.test(navigator.userAgent)
     || /1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s\-)|ai(ko|rn)|al(av|ca|co)|amoi|an(ex|ny|yw)|aptu|ar(ch|go)|as(te|us)|attw|au(di|\-m|r |s )|avan|be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|br(e|v)w|bumb|bw\-(n|u)|c55\/|capi|ccwa|cdm\-|cell|chtm|cldc|cmd\-|co(mp|nd)|craw|da(it|ll|ng)|dbte|dc\-s|devi|dica|dmob|do(c|p)o|ds(12|\-d)|el(49|ai)|em(l2|ul)|er(ic|k0)|esl8|ez([4-7]0|os|wa|ze)|fetc|fly(\-|_)|g1 u|g560|gene|gf\-5|g\-mo|go(\.w|od)|gr(ad|un)|haie|hcit|hd\-(m|p|t)|hei\-|hi(pt|ta)|hp( i|ip)|hs\-c|ht(c(\-| |_|a|g|p|s|t)|tp)|hu(aw|tc)|i\-(20|go|ma)|i230|iac( |\-|\/)|ibro|idea|ig01|ikom|im1k|inno|ipaq|iris|ja(t|v)a|jbro|jemu|jigs|kddi|keji|kgt( |\/)|klon|kpt |kwc\-|kyo(c|k)|le(no|xi)|lg( g|\/(k|l|u)|50|54|\-[a-w])|libw|lynx|m1\-w|m3ga|m50\/|ma(te|ui|xo)|mc(01|21|ca)|m\-cr|me(rc|ri)|mi(o8|oa|ts)|mmef|mo(01|02|bi|de|do|t(\-| |o|v)|zz)|mt(50|p1|v )|mwbp|mywa|n10[0-2]|n20[2-3]|n30(0|2)|n50(0|2|5)|n7(0(0|1)|10)|ne((c|m)\-|on|tf|wf|wg|wt)|nok(6|i)|nzph|o2im|op(ti|wv)|oran|owg1|p800|pan(a|d|t)|pdxg|pg(13|\-([1-8]|c))|phil|pire|pl(ay|uc)|pn\-2|po(ck|rt|se)|prox|psio|pt\-g|qa\-a|qc(07|12|21|32|60|\-[2-7]|i\-)|qtek|r380|r600|raks|rim9|ro(ve|zo)|s55\/|sa(ge|ma|mm|ms|ny|va)|sc(01|h\-|oo|p\-)|sdk\/|se(c(\-|0|1)|47|mc|nd|ri)|sgh\-|shar|sie(\-|m)|sk\-0|sl(45|id)|sm(al|ar|b3|it|t5)|so(ft|ny)|sp(01|h\-|v\-|v )|sy(01|mb)|t2(18|50)|t6(00|10|18)|ta(gt|lk)|tcl\-|tdg\-|tel(i|m)|tim\-|t\-mo|to(pl|sh)|ts(70|m\-|m3|m5)|tx\-9|up(\.b|g1|si)|utst|v400|v750|veri|vi(rg|te)|vk(40|5[0-3]|\-v)|vm40|voda|vulc|vx(52|53|60|61|70|80|81|83|85|98)|w3c(\-| )|webc|whit|wi(g |nc|nw)|wmlb|wonu|x700|yas\-|your|zeto|zte\-/i.test(navigator.userAgent.substr(0,4))) {
@@ -103,83 +113,83 @@
     } else {
       linkUid = linkUid.substring(1,5);  // next 4 chars are the actual code
       console.log("serverIndex: "+serverIndex);
-      isLocked = false;
+      isLocked = true;
     }
   }
   if (linkUid == "") {  // so haven't picked a server yet... generate a new linkUid
     linkUid = ""+(Math.random() + 1).toString(36).substring(2,6);  // 4 "random" [0-9a-z]
     document.getElementById("info_div_tr").style.display = "none";  // hide the "explain" graphic until someone else connects
+    leader = true;
   }
   console.log("linkUid: "+linkUid);
-  document.getElementById("mini_qr_div_br").style.display = "none";
-  if (DeviceOrientationEvent.requestPermission) {
-    //window.alert("support yet");
-  } else {
-    //window.alert("don't support yet");
-  }
+  document.getElementById("mini_qr_div_br").style.display = "none";  // hide the QR code in the bottom right corner
   window.addEventListener("deviceorientation", sendOrientationMsg, true);
   window.addEventListener("keydown", keyPressed, false);
   document.addEventListener("touchstart", touchStart, {passive: false});
   document.addEventListener("touchmove", touchMove, {passive: false});
   document.addEventListener("touchend", touchEnd, {passive: false});
 
-  var touchX = null;
+  var w = window.innerWidth;
+  var h = window.innerHeight;
+  var touchX = null;  // where we're touching on the screen
   var touchY = null;
-  var diffX = 0;
+  var diffX = 0;  // the difference between the last position and this one (to calculate speed of rotation for spinning effect)
   var diffY = 0;
   var spinning = false;
 
   function touchStart(e) {
-    if (!chosenIsConnected || isLocked) return;
+    if (!chosenIsConnected || (isLocked && leader)) return;
     //if (isMobile) e.preventDefault();
     e.preventDefault();
-    //console.log("Start swipe");
     spinning = false;
-    touchX = e.touches[0].screenX;
-    touchY = e.touches[0].screenY;
+    touchX = e.touches[0].pageX;
+    touchY = e.touches[0].pageY;
+    if ((w-touchX) < 50 && touchY < 60) {  // this is because sometimes the "explain" button link doesn't work for touch, only clicking on it with mouse
+      window.open('explain.html','_blank');
+    }
   }
 
   function touchMove(e) {
-    if (!chosenIsConnected || isLocked) return;
+    if (!chosenIsConnected || (isLocked && leader)) return;
     if (isMobile) e.preventDefault();
     e.preventDefault();
-    diffX = e.touches[0].screenX - touchX;  // calculate the diff
-    diffY = e.touches[0].screenY - touchY;
-    touchX = e.touches[0].screenX;  // update the previous coordinates
-    touchY = e.touches[0].screenY;
-    //console.log("x: "+diffX+", y:"+diffY);
+    diffX = e.touches[0].pageX - touchX;  // calculate the diff
+    diffY = e.touches[0].pageY - touchY;
+    touchX = e.touches[0].pageX;  // update the previous coordinates
+    touchY = e.touches[0].pageY;
     sendSwipeMsg(diffX,diffY);  // publish a message
   }
 
   function touchEnd(e) {
     //console.log("Release!  diffX:"+diffX+", diffY: "+diffY);
-    if (!chosenIsConnected || isLocked) return;
+    if (!chosenIsConnected || (isLocked && leader)) return;
     spinning = true;
     spin();
   }
 
   function spin() {
     if (!spinning) return;
-    var deets = {id: uid, a: 0, b: (diffY*-0.3333), g: (diffX*-0.3333)};
+    var deets = {id: uid, a: 0, b: (diffY*-0.3333).toFixed(3), g: (diffX*-0.3333).toFixed(3)};
     //console.log(deets);
     var message = new Paho.MQTT.Message(JSON.stringify(deets));
     message.destinationName = "qr/ori2/"+linkUid;
     chosen.send(message);
     diffX *= 0.95;
     diffY *= 0.95;
-    if (Math.abs(diffX) > 0.5 || Math.abs(diffY) > 0.5) {
-      window.setTimeout(spin,25);
+    if (Math.abs(diffX) > 0.5 || Math.abs(diffY) > 0.5) {  // slow the spin down slightly each loop
+      window.setTimeout(spin,25);  // only keep going until we've run out of rotation
     }
   }
 
   // generate the QR code URL, using proxy on sg demo nginx
-  function getQrUrl(size) {
+ /* function getQrUrl(size) {
     // https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=Example
-    // &color=00CB95& // actual Solace green, but we want brighter
-    var src = "https://sg.solace.com/qrapi?data=https://sg.solace.com/qr%3F"+serverIndex+linkUid+"&size="+size+"x"+size+"&color=00fdbd&bgcolor=333&margin=0&qzone=1";  // brightened green
+    // &color=00C895& // actual Solace green, but we want brighter
+    var src = "https://sg.solace.com/qrapi?data=https://sg.solace.com/qr%3F"+serverIndex+linkUid+"&size="+size+"x"+size+"&color=00fdbd&bgcolor=20262A&margin=0&qzone=1";  // brightened green
     console.log(src);
     return(src);
   }
+*/
 
   function getQrUrl2(size) {
     var opts = {
@@ -188,21 +198,18 @@
       margin: 1,
       scale: 20,
       color: {
-        dark:"#00fdbd",
-        dark:"#333333",
-        light:"#000000",
+        dark:"#20262A",
         light:"#00fdbd",
-	//light:"#00CB95",
+	      //light:"#00C895",
       },
-      //type: ''
     };
 
     QRCode.toDataURL(URL_WHERE_DEPLOYED+'?'+serverIndex+linkUid, opts, function (err, url) {
-      //console.log(url)
-      loadQr3(url);
+      loadQr3(url);  // on success, do this
     });
   }
 
+  // now let's setup some of the 3D scene
   var camera, scene, renderer;
   var cube;
   var bufferScene;
@@ -223,7 +230,7 @@
     spotLight.position.set( 100, 1000, 100 );
     scene.add( spotLight );
     // add a green light underneath, to the side
-    var spotLight2 = new THREE.SpotLight( 0x00CB95,0.75);
+    var spotLight2 = new THREE.SpotLight( 0x00C895,0.75);
     spotLight2.position.set( 1000, -1000, 0 );
     scene.add( spotLight2 );
     // this is a plane for a backdrop for making the flash with new joiners
@@ -239,7 +246,7 @@
     window.addEventListener('resize',onWindowResize,false);
     animate();
   }
-  init();
+  init();  // set it up now!
 
   function animate() {
     requestAnimationFrame( animate );
@@ -256,17 +263,13 @@
     scene.add( benchPlane );
   }
 
-  if (serverIndex == null) loadBench();
+  if (serverIndex == null) loadBench();  // havne't chosen a server yet, so show the "benchmarking" graphic
   // the graphics for the side of the cube
   var qrTexture;
   var qrTexture2;
   var solcube = new THREE.TextureLoader().load( 'gfx/sol_cube.png' );
   var solcloud = new THREE.TextureLoader().load( 'gfx/sol_cloud.png' );
   // this is only called inside "finalize" method
-
-  function loadQr2() {
-    getQrUrl2();
-  }
 
   function loadQr3(url) {
     if (!isMobile) {
@@ -290,7 +293,7 @@
   }
 
 
-  function loadQr() {
+/*  function loadQr() {
     if (!isMobile) {
       // small QR code for the right bottom corner on desktops
       document.getElementById("mini_qr_div_br").innerHTML = '<img width="64" src="'+getQrUrl(128)+'"/>';
@@ -310,6 +313,7 @@
       }
     );
   }
+*/
 
   // means everything is done and loaded
   function drawBox() {
@@ -333,6 +337,8 @@
   }
 
   function onWindowResize() {
+    w = window.innerWidth;
+    h = window.innerHeight;
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
     renderer.setSize( window.innerWidth-5, window.innerHeight-5);
@@ -367,9 +373,14 @@
       if (message.destinationName == "qr/ori/"+linkUid) {
         msgRec++;
         rotate(JSON.parse(message.payloadString));
-      } else if (message.destinationName == "qr/ori2/"+linkUid) {
+      } else if (message.destinationName == "qr/ori2/"+linkUid) {  // someone has swiped
         msgRec++;
         rotate2(JSON.parse(message.payloadString));
+      } else if (message.destinationName == "qr/ori3/"+linkUid) {  // rotation via accelerometer
+        msgRec++;
+        rotate3(JSON.parse(message.payloadString));
+      } else if (message.destinationName == "qr/ori4/"+linkUid && !leader) {  // absolute orientation
+        absoluteRotate(JSON.parse(message.payloadString));  // sent by the leader to keep everyone in sync
       } else if (message.destinationName == "qr/timing/"+uid) {
         if (isBenchmarking) {
           var delta = Date.now() - message.payloadString;
@@ -398,9 +409,11 @@
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   // list of connections to try /////////////////////////////////////////////////////////////////////////////////////
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  addConnection("Eclipse Test Server","mqtt.eclipse.org",Number(443),true,"","");       // pretty good
-  addConnection("Mosquitto Test Server","test.mosquitto.org",Number(8081),true,"","");  // garbage
-  // add more *WSS* MQTT connections here... sign up for Solace Cloud!!
+  addConnection("Eclipse Test Server","mqtt.eclipseprojects.io",Number(443),true,"","");
+  addConnection("Mosquitto Test Server","test.mosquitto.org",Number(8081),true,"","");
+  // addConnection("EMQ Test Server","broker.emqx.io",Number(8083),false,"","");  // not WSS, get "mixed content" warnings in Chrome
+  // addConnection("HiveMQ Test Server","broker.hivemq.com",Number(8000),false,"","");  // not WSS
+  // add more MQTT connections here... sign up for Solace Cloud!!
   //addConnection("Solace Cloud (Where??)","",Number(8443),true,"solace-cloud-client","");
 
   var isBenchmarking = false;  // set to true when first connect, then introduce timer
@@ -413,12 +426,12 @@
     // connect to all, and benchmark
     document.getElementById('conn').value = "Benchmarking...";
     for (var i=0;i<connections.length;i++) {
-      var client = connections[i]['client'];
+      var client = connections[i].client;
       console.log("Connecting to "+client.desc);
       client.connect(client.connectOptions);
     }
-  } else {
-    chosen = connections[serverIndex]['client'];
+  } else {  // this is a follower, the broker has been selected by the leader, and we're just choosing it
+    chosen = connections[serverIndex].client;
     document.getElementById('conn').value = 'Connecting to '+chosen.desc;
     console.log("Connecting to "+chosen.desc);
     chosen.connect(chosen.connectOptions);
@@ -433,9 +446,10 @@
 
   var connCount = 0;
   var tooLateCount = 0;
+  var haveReceivedOneSelfOriEvent = false;
   // called when the client connects
   function onConnect(obj) {
-if (chosenIsConnected) return;
+    if (chosenIsConnected) return;  // if we've already chosen what connection to use, ignore any else that comes in late
     connCount++;
     //document.getElementById('conn').innerHTML = '<i>CONNECT'+connCount+'</i>';
     var client = obj.invocationContext;
@@ -454,8 +468,20 @@ if (chosenIsConnected) return;
         setTimeout(checkIfDone,2000);  // give it a bit to complete
       }
       setTimeout(benchmark,50,client,10);  // start the benchmarking in 50ms for 10 loops
-    } else {  // we know which particular instance we want to connect to
+    } else {  // this must be a follower... we know which particular instance we want to connect to
       finalizeChooseConnection();
+      setTimeout(function showFingerTouchGfx() {
+        if (!haveReceivedOneSelfOriEvent) {  // so we're connected now, but haven't received any orientation event... so show a grphic to touch screen
+          const t = document.getElementById('touch_here');
+          t.style.left = ((w/2)-130)+"px";
+          t.style.top = ((h/2)-100)+"px";
+          //t.style.opacity =  1;
+          setTimeout(function fadein() {
+            t.style.opacity = +t.style.opacity + 0.02;
+            if (!haveReceivedOneSelfOriEvent && +t.style.opacity < 1) setTimeout(fadein,10);
+          },10);
+        }
+      },1500);  // show after 1.5 seconds of nothing
     }
   }
 
@@ -492,11 +518,11 @@ if (chosenIsConnected) return;
       if (i != index) {
         if (connections[i].client.isConnected) {
           connections[i].client.disconnect();
-	}
+        }
       } else {
         // chosen = whichever cloud I'm connected to
-        //chosen = connections[i].client;
-        chosen = connections[i]['client'];
+        chosen = connections[i].client;
+        //chosen = connections[i]['client'];
         serverIndex = i;
         prevDelta = min;  // initialize the latency var with the values we calculated
         finalizeChooseConnection();
@@ -507,18 +533,16 @@ if (chosenIsConnected) return;
   function finalizeChooseConnection() {
     document.getElementById('conn').value = 'Connected to '+chosen.desc;
     chosen.subscribe("qr/ori/"+linkUid);
-    chosen.subscribe("qr/ori2/"+linkUid);
+    chosen.subscribe("qr/ori2/"+linkUid);  // for accellerometer
+    chosen.subscribe("qr/ori3/"+linkUid);  // for swipe
+    chosen.subscribe("qr/ori4/"+linkUid);  // for absolute position from leader
     isBenchmarking = false;
     isConnSelected = true;  // benchmarking is done, choose the connection!
-    //loadQr();
-    loadQr2();
+    getQrUrl2();
   }
 
   // makes the background flash when someone new joins the mesh
   function newJoiner(count) {
-    //var col = 255-(count*17);
-    //var colStr = 'rgb('+col+','+col+','+col+')';
-    //scene.background = new THREE.Color(colStr);
     backdrop_material.opacity = (13-count)/13;
     count++;
     if (count < 14) {
@@ -527,7 +551,7 @@ if (chosenIsConnected) return;
   }
 
   // calculates and updates the latency displayed on the screen. uses a smoothed average
-  var prevDelta = 0;  // this will get overwritten once we choose which connection we want
+  var prevDelta = 0;  // this will get updated with computed latency once we choose which connection we want
   function timing(ts) {
     var delta = Date.now() - ts;
     prevDelta = 0.95*prevDelta + 0.05*delta;
@@ -535,7 +559,7 @@ if (chosenIsConnected) return;
   }
 
   var prev = {};
-  function rotate(deets) {
+/*  function rotate(deets) {
     //console.log("rotate("+JSON.stringify(deets));
     if (!prev.hasOwnProperty(deets.id)) {  // first time seeing this particular UID
       prev[deets.id] = {};  // initialize
@@ -593,9 +617,19 @@ if (chosenIsConnected) return;
     prev[deets.id]["beta"] = deets.b;
     prev[deets.id]["gamma"] = deets.g;
   }
+*/
 
-
+  // generated by swipes
   function rotate2(deets) {
+    if (!haveReceivedOneSelfOriEvent && deets.id === uid) {
+      haveReceivedOneSelfOriEvent = true;
+      document.getElementById('touch_here').style.opacity = 0;
+    }
+    rotate3(deets);
+  }
+
+  // for the device orientation accelelorometer
+  function rotate3(deets) {
     //console.log("rotate("+JSON.stringify(deets));
     if (!prev.hasOwnProperty(deets.id)) {  // first time seeing this particular UID
       prev[deets.id] = {};  // initialize
@@ -616,39 +650,39 @@ if (chosenIsConnected) return;
       //}
     }
     if (isLocked) return;
-    var factor = 0.015;
+    //var factor = 0.015;
     var factor = 0.02;
     cube.rotation.z -= factor * deets.a;
     cube.rotation.x -= factor * deets.b;
     cube.rotation.y -= factor * deets.g;
   }
 
+  function absoluteRotate(deets) {
+    cube.rotation.x = deets.x;
+    cube.rotation.y = deets.y;
+    cube.rotation.z = deets.z;
+  }
 
-   function keyPressed(event) {
-     if (!chosenIsConnected || isLocked) return;
-  //   var message = new Paho.MQTT.Message(""+event.keyCode);
-  //   message.destinationName = "keypress";
-  //   chosen.send(message);
-     //console.log(event.keyCode);
-     //console.log(event.key);
-     var factor = 0.1;
-     if (event.key === "ArrowRight") {
-       mesh.rotation.y -= factor;
-     } else if (event.key === "ArrowLeft") {
-       mesh.rotation.y += factor;
-     } else if (event.key === "ArrowUp") {
-       mesh.rotation.x -= factor;
-     } else if (event.key === "ArrowDown") {
-       mesh.rotation.x += factor;
-     }
-   }
+  // in case you want to rotate using your keyboard?
+  function keyPressed(event) {
+    if (!chosenIsConnected || isLocked) return;
+    var factor = 0.1;
+    if (event.key === "ArrowRight") {
+      cube.rotation.y -= factor;
+    } else if (event.key === "ArrowLeft") {
+      cube.rotation.y += factor;
+    } else if (event.key === "ArrowUp") {
+      cube.rotation.x -= factor;
+    } else if (event.key === "ArrowDown") {
+      cube.rotation.x += factor;
+    }
+  }
 
   var firstOri = false;
   var prevOri = { alpha: 0, beta: 0, gamma: 0 };
+  // this only works on Android phones now, accelerometer data is blocked on iPhone, this is fired when the device moves
   function sendOrientationMsg(event) {
-    //if (!chosenIsConnected) return;
-    if (!chosenIsConnected || isLocked) return;
-    //if (isLocked) return;
+    if (!chosenIsConnected || (isLocked && leader)) return;
     if (!firstOri) {
       firstOri = true;
       //window.alert("You've just received the first orientation event!");
@@ -692,13 +726,12 @@ if (chosenIsConnected) return;
     }
     //var factor = 0.015;
     var factor = 1;
-    var diffA = 1* (factor * (prevOri.alpha - alpha)).toFixed(6);
-    var diffB = 1* (factor * (prevOri.beta - beta)).toFixed(6);
-    var diffG = 1* (factor * (prevOri.gamma - gamma)).toFixed(6);
+    var diffA = (factor * (prevOri.alpha - alpha)).toFixed(6);
+    var diffB = (factor * (prevOri.beta - beta)).toFixed(6);
+    var diffG = (factor * (prevOri.gamma - gamma)).toFixed(6);
     var deets = {id: uid, a: diffA, b: diffB, g: diffG};
-    //console.log(deets);
     var message = new Paho.MQTT.Message(JSON.stringify(deets));
-    message.destinationName = "qr/ori2/"+linkUid;
+    message.destinationName = "qr/ori3/"+linkUid;
     chosen.send(message);
     prevOri.alpha = alpha;
     prevOri.beta = beta;
@@ -706,56 +739,51 @@ if (chosenIsConnected) return;
   }
 
   function sendSwipeMsg(x,y) {
-    //if (!chosenIsConnected) return;
-    //  cube.rotation.y += x * 0.01;
-   //   cube.rotation.x += y * 0.01;
-   //   return;
-
-    //cube.rotation.y -= factor * (prev[deets.id]["alpha"] - deets.a);
-    //cube.rotation.x -= factor * (prev[deets.id]["beta"] - deets.b);
     var deets = {id: uid, a: 0, b: (y*-0.25), g: (x*-0.25)};
-    //console.log(deets);
     var message = new Paho.MQTT.Message(JSON.stringify(deets));
     message.destinationName = "qr/ori2/"+linkUid;
     chosen.send(message);
   }
 
-  // the following nameless function is used to provide live latency numbers
+  // only sent by the leader, to keep everyone in sync; topic "ori4"
+  setInterval(function sendAbsolutePosition() {
+    if (!leader || !chosenIsConnected) return; //|| isLocked) return;
+    var message = new Paho.MQTT.Message(JSON.stringify({x:cube.rotation.x, y:cube.rotation.y, z:cube.rotation.z}));
+    message.destinationName = "qr/ori4/"+linkUid;
+    chosen.send(message);
+  },2000);
+
+  // the following function is used to provide live latency numbers
   // it sends 4 msg/s on a unique "timing" topic, used to calcualate RTT to SC
-  setInterval(function() {
+  setInterval(function updateLatency() {
     // don't update the latency until we've chosen a connection
     if (!chosenIsConnected) return;
     var timestamp = ""+Date.now();
     var message = new Paho.MQTT.Message(timestamp);
     message.destinationName = "qr/timing/"+uid;
     chosen.send(message);
-  },250);
+  },500);
 
   // slowly rotate the cube around all 3 axes
-  setInterval(function() {
+  setInterval(function slowlyRotateCube() {
     // wait until we've chosen which connection we want, and have linked to one other (i.e. unlocked)
     if (!chosenIsConnected || isLocked) return;
     var factor = 0.00025;
     cube.rotation.y -= factor * 4;
     cube.rotation.x -= factor * 2;
     cube.rotation.z += factor * 1;
-  },25);
+  },16);
 
   // update the message rates every 250ms
-  setInterval(function() {
+  setInterval(function updateMsgRates() {
     // wait until we've chosen which connection we want, and have linked to one other (i.e. unlocked)
     if (!chosenIsConnected || isLocked) return;
     // since we sample 4 times a second, need to multiply by 4 (so, 0.75 + 0.25 for smoothed average)
     msgRecRate = (0.75 * msgRecRate) + (0.25 * (msgRec - prevMsgRec)); 
-    document.getElementById('message_rate').value = (4 * msgRecRate).toFixed(0);
+    document.getElementById('message_rate').value = (2 * msgRecRate).toFixed(0);
     prevMsgRec = msgRec;
-  },250);
+  },500);
 
-  //var vibrate = navigator.vibrate || navigator.webkitVibrate || navigator.mozVibrate || navigator.msVibrate; 
-  //if (vibrate) {
-  //  console.log("VAIBRATTE!");
-  //  navigator.vibrate(1000);
- /// }
 </script>
 </body>
 </html>
