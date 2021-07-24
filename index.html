@@ -203,7 +203,7 @@
 	      //light:"#00C895",
       },
     };
-
+    console.log('Generating QR for: ' + URL_WHERE_DEPLOYED+'?'+serverIndex+linkUid);
     QRCode.toDataURL(URL_WHERE_DEPLOYED+'?'+serverIndex+linkUid, opts, function (err, url) {
       loadQr3(url);  // on success, do this
     });
