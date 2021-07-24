@@ -1,4 +1,5 @@
 # Entanglement QR Code Demo
+
 Another demo by Aaron to visualize the latency and connectiveness with Solace Cloud MQTT
 
 https://sg.solace.com/qr
@@ -22,4 +23,3 @@ Click [here](https://sg.solace.com/qr) load up the page. It will generate a QR c
 # Licences
 
 Check the LICENSE file
-
