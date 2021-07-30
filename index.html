@@ -120,6 +120,7 @@
     linkUid = ""+(Math.random() + 1).toString(36).substring(2,6);  // 4 "random" [0-9a-z]
     document.getElementById("info_div_tr").style.display = "none";  // hide the "explain" graphic until someone else connects
     leader = true;
+    window.alert("You'll need a 2nd phone to try this, or load sg.solace.com/qr on your desktop instead!");
   }
   console.log("linkUid: "+linkUid);
   document.getElementById("mini_qr_div_br").style.display = "none";  // hide the QR code in the bottom right corner
