@@ -183,15 +183,6 @@
     }
   }
 
-  // generate the QR code URL, using proxy on sg demo nginx
- /* function getQrUrl(size) {
-    // https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=Example
-    // &color=00C895& // actual Solace green, but we want brighter
-    var src = "https://sg.solace.com/qrapi?data=https://sg.solace.com/qr%3F"+serverIndex+linkUid+"&size="+size+"x"+size+"&color=00fdbd&bgcolor=20262A&margin=0&qzone=1";  // brightened green
-    console.log(src);
-    return(src);
-  }
-*/
 
   function getQrUrl2(size) {
     var opts = {
@@ -293,29 +284,6 @@
       }
     );
   }
-
-
-/*  function loadQr() {
-    if (!isMobile) {
-      // small QR code for the right bottom corner on desktops
-      document.getElementById("mini_qr_div_br").innerHTML = '<img width="64" src="'+getQrUrl(128)+'"/>';
-    }
-    qrTexture = new THREE.TextureLoader().load( getQrUrl(256),
-      // onLoad callback
-      function ( qrTexture ) {
-        console.log('loaded the QR!');
-        drawBox();
-      },
-      // onProgress callback currently not supported
-      undefined,
-      // onError callback
-      function ( err ) {
-        console.error( "Couldn't fetch QR code. Sorry!!" );
-        alert( "Couldn't fetch QR code. Sorry!!" );
-      }
-    );
-  }
-*/
 
   // means everything is done and loaded
   function drawBox() {
@@ -587,7 +555,6 @@
           camera.position.z = 450;  // move camera closer
           document.getElementById("info_div_tr").style.display = "block";  // show the "explain" div
           if (!isMobile) {
-            //document.getElementById("mini_qr_div_br").innerHTML = '<img width="64" src="'+getQrUrl(64)+'"/>';
             document.getElementById("mini_qr_div_br").style.display = "block";
           }
         }
