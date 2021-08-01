@@ -680,7 +680,7 @@
   setInterval(function slowlyRotateCube() {
     // wait until we've chosen which connection we want, and have linked to one other (i.e. unlocked)
     if (!chosenIsConnected || isLocked) return;
-    var factor = 0.00025;
+    var factor = 0.0005;
     cube.rotation.y -= factor * 4;
     cube.rotation.x -= factor * 2;
     cube.rotation.z += factor * 1;
