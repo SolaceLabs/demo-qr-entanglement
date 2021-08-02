@@ -104,7 +104,9 @@
   }
   uid = ""+(Math.random() + 1).toString(36).substring(2,6);  // generate a "random" [0-9a-z] 4 char ID
   console.log("uid: "+uid);
-  linkUid = window.location.search.substring(1);  // grab all the chars at the end of the URL after the '?'
+  linkUid = window.location.search.substring(1);  // grab all the chars at the end of the URL after the '?', then check it
+  const linkRegex = /^[0-9][0-9a-z]{4}$/;  // should be one server index, and then 4 chars
+  if (!linkRegex.test(linkUid)) linkUid = "";  // blank it, not what I'm expecting
   if (linkUid != "") {  // means there were URL parameters... try to parse...
     serverIndex = 1 * linkUid.substring(0,1);  // grab the first character, indicates which cloud to connect to
     if (isNaN(serverIndex) || serverIndex < 0 || serverIndex > 3 || linkUid.length != 5) {  // not valid
