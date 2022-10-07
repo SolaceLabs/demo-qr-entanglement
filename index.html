@@ -71,6 +71,7 @@
 </head>
 <body>
 <div id='info_div_tr'><a href="explain.html" target="_blank"><img src="gfx/qr_explain3.png"/></a></div>
+<!--div id='info_div_tr'><a href="https://www.youtube.com/watch?v=AZDP8DbyfmE" target="_blank"><img src="gfx/qr_explain3.png"/></a></div-->
 <div id='touch_here'><img src="gfx/touch2.png"/></div>
 <div id='mini_qr_div_br'></div>
 <div id="solace_logo_div_tl">
@@ -379,16 +380,13 @@
   // list of connections to try /////////////////////////////////////////////////////////////////////////////////////
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   // add your own MQTT connections here... sign up for Solace Cloud!!
-  //addConnection("Solace Cloud (Where??)","",Number(8443),true,"solace-cloud-client","");
-  addConnection("Solace Cloud (AWS Singapore)","mr2ko4me0pkz5f.messaging.solace.cloud",Number(8443),true,"qr","qr");
-  addConnection("Solace Cloud (Azure Virginia)", "mr-2ko4me0pl0gn.messaging.solace.cloud",Number(8443),true,"qr","qr");
-  addConnection("Solace Cloud (GCP London)", "mr-djrh9xe1yxi.messaging.solace.cloud",Number(8443),true,"qr","qr");
-  // can also use other MQTT brokers, if you want...
-/*  addConnection("Eclipse Test Server","mqtt.eclipseprojects.io",Number(443),true,"","");
+  //addConnection("Solace Cloud (Where??)","mr123abc.messaging.solace.cloud", Number(8443), true, "solace-cloud-client", "");
+  // can also use other MQTT brokers, if you want...or comment these out
+  addConnection("Eclipse Test Server","mqtt.eclipseprojects.io",Number(443),true,"","");
   addConnection("Mosquitto Test Server","test.mosquitto.org",Number(8081),true,"","");
   // addConnection("EMQ Test Server","broker.emqx.io",Number(8083),false,"","");  // not WSS, get "mixed content" warnings in Chrome
   // addConnection("HiveMQ Test Server","broker.hivemq.com",Number(8000),false,"","");  // not WSS
-*/
+
 
   var isBenchmarking = false;  // set to true when first connect, then introduce timer
   var isConnSelected = false;

@@ -1,14 +1,17 @@
 # Entanglement QR Code Demo
 
-Another demo by Aaron to visualize the latency and connectiveness with Solace Cloud MQTT
+Another demo by Aaron to visualize the latency and connectiveness with Solace Cloud MQTT (or any MQTT service, really!).
+
 
 ## https://sg.solace.com/qr
 
 ![](https://github.com/aaron-613/demo-qr-entanglement/blob/master/gfx/qr_screenshot.png "Screenshot")
 
+
 ## Premise
 
 [Click here](https://sg.solace.com/qr) load up the page. It will generate a QR code to scan with a phone. Once the phone connects and entagles, you can control the cube from either device either via rotational/accelerometer data (doesn't work on iPhones anymore), or via swipe gestures.
+
 
 ## Instructions to deploy
 
