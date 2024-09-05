@@ -638,9 +638,9 @@
     }
     //var factor = 0.015;
     var factor = 1;
-    var diffA = (factor * (prevOri.alpha - alpha)).toFixed(6);
-    var diffB = (factor * (prevOri.beta - beta)).toFixed(6);
-    var diffG = (factor * (prevOri.gamma - gamma)).toFixed(6);
+    var diffA = (factor * (prevOri.alpha - alpha)).toFixed(6) * 1;
+    var diffB = (factor * (prevOri.beta - beta)).toFixed(6) * 1;
+    var diffG = (factor * (prevOri.gamma - gamma)).toFixed(6) * 1;
     var deets = {id: uid, a: diffA, b: diffB, g: diffG};
     var message = new Paho.MQTT.Message(JSON.stringify(deets));
     message.destinationName = "qr/ori3/"+linkUid;
@@ -651,7 +651,7 @@
   }
 
   function sendSwipeMsg(x,y) {
-    var deets = {id: uid, a: 0, b: (y*-0.25), g: (x*-0.25)};
+    var deets = {id: uid, a: 0, b: (y*-0.25).toFixed(6) * 1, g: (x*-0.25).toFixed(6) * 1};
     var message = new Paho.MQTT.Message(JSON.stringify(deets));
     message.destinationName = "qr/ori2/"+linkUid;
     chosen.send(message);
@@ -660,7 +660,7 @@
   // only sent by the leader, to keep everyone in sync; topic "ori4"
   setInterval(function sendAbsolutePosition() {
     if (!leader || !chosenIsConnected) return; //|| isLocked) return;
-    var message = new Paho.MQTT.Message(JSON.stringify({x:cube.rotation.x, y:cube.rotation.y, z:cube.rotation.z}));
+    var message = new Paho.MQTT.Message(JSON.stringify({x:cube.rotation.x.toFixed(6) * 1, y:cube.rotation.y.toFixed(6) * 1, z:cube.rotation.z.toFixed(6) * 1}));
     message.destinationName = "qr/ori4/"+linkUid;
     chosen.send(message);
   },2000);
